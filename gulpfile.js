@@ -18,8 +18,7 @@ gulp.task('js', function() {
  
 gulp.task('node-mods', function() {
   return gulp.src('./package.json')
-    .pipe(gulp.dest('dist/'))
-    .pipe(install({production: true}));
+    .pipe(gulp.dest('dist/'));
 });
  
 gulp.task('zip', function() {

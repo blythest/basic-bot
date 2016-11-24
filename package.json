@@ -1,5 +1,5 @@
 {
-  "name": "blank-lambda-bot",
+  "name": "basic-bot",
   "version": "1.0.0",
   "description": "a blank lambda-bot template",
   "main": "index.js",
@@ -29,7 +29,7 @@
     "run-sequence": "^1.2.1"
   },
   "dependencies": {
-    "botfiles": "file:///Users/emckean/Code/blank-lambda-bot/botfiles",
+    "botfiles": "file:botfiles",
     "twit": "^2.2.4",
     "underscore": "^1.8.3",
     "wordfilter": "^0.2.6"
