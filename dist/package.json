@@ -1,7 +1,7 @@
 {
   "name": "basic-bot",
   "version": "1.0.0",
-  "description": "a blank lambda-bot template",
+  "description": "a basic bot template",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
@@ -12,9 +12,9 @@
     "bot",
     "template"
   ],
-  "author": "Erin McKean",
+  "author": "Blythe Sheldon",
   "license": "ISC",
-  "repository": "https://github.com/emckean/blank-lambda-bot",
+  "repository": "https://github.com/blythest/basic-bot",
   "devDependencies": {
     "chai": "^3.5.0",
     "del": "^2.2.0",
