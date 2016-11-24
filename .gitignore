@@ -2,6 +2,7 @@
 botfiles/config.js
 lambda-config.js
 node_modules/*
+twitter.zip
 
 #OS junk files
 *.DS_Store
