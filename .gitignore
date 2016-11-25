@@ -1,6 +1,7 @@
 #config
 botfiles/config.js
 lambda-config.js
+s3_credentials.js
 node_modules/*
 twitter.zip
 
