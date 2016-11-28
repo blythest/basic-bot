@@ -1,53 +1,65 @@
 var Twit = require('twit');
-var wordfilter = require('wordfilter');
 var T = new Twit(require('botfiles/config.js'));
-var myText = require('botfiles/sample-text.js');
+var readline = require('readline');
+var AWS = require('aws-sdk');
+var s3_params = require("s3_params");
 
-//a nice 'pick' function thanks to Darius Kazemi: https://github.com/dariusk
-Array.prototype.pick = function() {
-  return this[Math.floor(Math.random()*this.length)];
-};
+// Load credentials and set region from JSON file
+AWS.config.loadFromPath('s3_config.json');                    
 
-//functions 
-  function tweetOK(phrase) {
-      if (!wordfilter.blacklisted(phrase) && phrase !== undefined && phrase !== "" && tweetLengthOK(phrase)){
-        return true;
-      } else {
-        return false;
-      }
-  }
+function sendTweet() {
+  // Get file from S3 and feed it into the ReadLine interface
+  var s3 = new AWS.S3();
+  var params = {Bucket: s3_params.bucket, Key: s3_params.key};
 
-  function tweetLengthOK(phrase) {
-      if (phrase.length <= 130){
-        return true;
-      } else {
-        return false;
-      }
-  }
+  var rl = readline.createInterface({
+      input: s3.getObject(params).createReadStream()
+  });
 
-function pickTweet(){
-      var tweetText = myText.pick();
-      if (tweetOK(tweetText)) {
-        return tweetText;
-      }
+  var output = "";
+  var firstLine = true;
+  var lineToTweet = "";
+
+  // ReadLine interface receives "line" event each time a line is read, and "close" event when the file is closed
+  rl.on('line', function(line) {
+
+    // If we're reading the first line of the file, tweet and remember it. Otherwise append it to output
+    if (firstLine == true) {
+
+        firstLine = false;
+
+        lineToTweet = line;
+
+      T.post('statuses/update', {status: lineToTweet}, function (error, tweet, response) {
+        if (error != null) {
+          console.log(error);
+        }
+      });
+
+    }
+    else
+      output += line + '\n';
+  })
+  .on('close', function() {
+
+    // Move the first line to the end of the file (so this can repeat infinitely) and upload to S3
+    output += lineToTweet;
+
+    var params_new = {Bucket: s3_params.bucket, Key: s3_params.key, Body: output, ContentType: 'text/plain'};
+
+    s3.upload(params_new, function(err, data) {
+      if (err) {
+        console.log(err);
+      } 
       else {
-        tweetText = pickTweet();
+        console.log(data.ETag);
       }
-  }
+    });
+  });
+}
 
-exports.handler = function myBot(event, context) {
-
-    var textToTweet = pickTweet();
-  
-  	T.post('statuses/update', { status: textToTweet }, function(err, reply) {
-              if (err) {
-                console.log('error:', err);
-                context.fail();
-              }
-              else {
-                console.log('tweet:', reply);
-                context.succeed();
-              }
-            });
-  };
+// Set up the exports.handler for AWS Lambda
+exports.handler = function (event, context) {
+  sendTweet(context.succeed, context.fail)
+};
 

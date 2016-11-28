@@ -3,7 +3,9 @@ var T = new Twit(require('botfiles/config.js'));
 var readline = require('readline');
 var AWS = require('aws-sdk');
 var s3_params = require("s3_params");
-// var myText = require('botfiles/sample-text.js');
+
+// Load credentials and set region from JSON file
+AWS.config.loadFromPath('s3_config.json');                    
 
 function sendTweet() {
   // Get file from S3 and feed it into the ReadLine interface
